@@ -1,0 +1,1 @@
+SELECT * FROM {{ source('mongo_data', 'movies') }}

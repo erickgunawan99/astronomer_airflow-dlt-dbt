@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: mongo_data                     # alias name used in dbt, can be same as schema
+    database: "{{ target.database }}"    # dynamically resolves to "test_db"
+    schema: mongo_data                   # the actual schema your raw tables are in
+    tables:
+      - name: movies
+      - name: users
+      - name: _dlt_loads 
+      - name: comments
+      - name: movies__genres
+      - name: movies__directors

@@ -1,0 +1,12 @@
+name: mongo_movies
+version: "1.0"
+profile: default
+
+models:
+  mongo_movies:
+    staging:
+      +materialized: view
+      +schema: staging
+    mongo_movies:
+      +materialized: table
+      +schema: marts

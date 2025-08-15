@@ -1,0 +1,35 @@
+# models/schema.yml
+version: 2
+
+models:
+  - name: stg_movies
+    columns:
+      - name: _id
+        tests:
+          - unique
+          - not_null
+  - name: stg_comments
+    columns:
+      - name: _id
+        tests:
+          - unique
+          - not_null
+  - name: genres_and_directors_with_good_comment_each_user
+    columns:
+      - name: email
+        tests:
+          - unique
+          - not_null
+  - name: comments_by_user
+    tests:
+      - unique:
+          column_name: "(name || '_' || email)"
+      - dbt_utils.expression_is_true:
+              expression: 'total_comment_count > 0'
+    columns:
+      - name: name
+        tests:
+          - not_null
+      - name: email
+        tests:
+          - not_null

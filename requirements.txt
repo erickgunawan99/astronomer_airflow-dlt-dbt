@@ -1,0 +1,9 @@
+# Astro Runtime includes the following pre-installed providers packages: https://www.astronomer.io/docs/astro/runtime-image-architecture#provider-packages
+dlt
+dbt-core
+dbt-postgres
+apache-airflow-providers-common-sql
+astronomer-cosmos
+pymongo
+psycopg2-binary
+astro-run-dag # This package is needed for the astro run command. It will be removed before a deploy

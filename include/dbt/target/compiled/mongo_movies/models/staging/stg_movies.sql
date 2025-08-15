@@ -1,0 +1,1 @@
+SELECT * FROM "test_db"."mongo_data"."movies"
