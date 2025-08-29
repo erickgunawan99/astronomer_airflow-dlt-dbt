@@ -32,15 +32,17 @@ Would be better on modern warehouses since they have rich ways to manipulate arr
 
 - **One of the models is a regex table that grabs the elements of movies for each user with a "good" comment associated to them.**
 <img width="999" height="469" alt="Screenshot 2025-08-13 232717" src="https://github.com/user-attachments/assets/f78daeaa-4171-4724-a9b7-d516c79c4b1b" />
+
 - **Run the airflow pipeline for the first time.**
-  - The first run yields:
+  
+- The first run yields:
 
 <img width="434" height="117" alt="Screenshot 2025-08-13 213700" src="https://github.com/user-attachments/assets/772b8079-030b-4c41-8895-0f666a26df70" />
 <img width="1110" height="202" alt="Screenshot 2025-08-13 213648" src="https://github.com/user-attachments/assets/3cb1c7e7-95f0-4421-8a70-2bd7008cb88a" />
 
 - **Then insert some data to test the DBT model that filters only movies, genres, and directors that have "good" comments and the "good" doesnt get prefixed by "not" for each user. A very customizable predicates of course with regex conditions that can be extended.**
 
-  -Inserting one "good" and one "not good". Should only 1 that get picked up and added to the collections if it works correctly 
+-Inserting one "good" and one "not good". Should only 1 that get picked up and added to the collections if it works correctly 
 
 <img width="1201" height="896" alt="Screenshot 2025-08-13 231712" src="https://github.com/user-attachments/assets/f6415024-133b-4727-bfe0-65a433fdecaf" />
 
