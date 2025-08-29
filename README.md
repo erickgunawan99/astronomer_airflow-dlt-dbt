@@ -1,4 +1,4 @@
-Astronomer to run airflow. Moving data from DLT into Postgres using DLT Python package. Then fiddle with them using DBT.
+- ** Astronomer to run airflow. Moving data from DLT into Postgres using DLT Python package. Then fiddle with them using DBT.
 Also trying Astronomer's cosmos tool to break up a DBT project models into a visualized airflow-esque DAG with clear dependencies within each other and then run them on airflow.
 
 
