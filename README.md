@@ -1,5 +1,5 @@
 Astronomer to run airflow. Moving data from DLT into Postgres using DLT Python package. Then fiddle with them using DBT.
-Also trying Astronomer's cosmos tool to break up a DBT project models into a visualized airflow-esque DAG with clear dependencies within each other and run them on airflow.
+Also trying Astronomer's cosmos tool to break up a DBT project models into a visualized airflow-esque DAG with clear dependencies within each other and then run them on airflow.
 
 
 <img width="904" height="766" alt="Screenshot 2025-08-15 224027" src="https://github.com/user-attachments/assets/da1c95b9-2c9a-4ea1-94e3-a1ba480f8727" />
@@ -8,12 +8,12 @@ Utilizing DLT and Pymongo client to read movies and comments collections in mong
 
 <img width="905" height="872" alt="Screenshot 2025-08-15 224101" src="https://github.com/user-attachments/assets/cd496038-db54-454e-adee-872c4292f597" />
 
-Cosmos provides DbtTaskGroup a method to run DBT build command (tests, snapshots, and run) on airflow.
+Cosmos provides DbtTaskGroup, a method to run DBT build command (tests, snapshots, and run) on airflow.
 
 <img width="1347" height="657" alt="Screenshot 2025-08-13 231529" src="https://github.com/user-attachments/assets/6b168b05-4c86-496e-aba9-5dc63da3b748" />
 
 Moving data using DLT table generates a dlt_load table that contains a insertion date column. 
-It also has a load id column which also present in the each raw table
+It also has a load id column, which also present in each raw table
 
 <img width="1147" height="793" alt="Screenshot 2025-08-14 003928" src="https://github.com/user-attachments/assets/33629293-1311-4276-a9f9-cbf496d3c77b" />
 
