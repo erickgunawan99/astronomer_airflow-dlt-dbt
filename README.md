@@ -1,61 +1,56 @@
-- **Astronomer to run airflow. Moving data from DLT into Postgres using DLT Python package. Then fiddle with them using DBT.
-Also trying Astronomer's cosmos tool to break up a DBT project models into a visualized airflow-esque DAG with clear dependencies within each other and then run them on airflow.**
+MongoDB to Postgres Data Pipeline: DLT, dbt, & Airflow
+* This project implements an automated ETL pipeline that migrates raw data from MongoDB to a PostgreSQL warehouse, applies modular transformations using dbt, and orchestrates the entire flow via Airflow using the Astronomer Cosmos integration.
+  
+🛠️ Tech Stack
+- Orchestration: Airflow (Astronomer)
 
+- Ingestion: DLT (Data Load Tool)
 
-<img width="904" height="766" alt="Screenshot 2025-08-15 224027" src="https://github.com/user-attachments/assets/da1c95b9-2c9a-4ea1-94e3-a1ba480f8727" />
+- Transformation: dbt (Data Build Tool)
 
-- **Utilizing DLT and Pymongo client to read movies and comments collections in mongo and return them, then insert them incrementally to Postgres.**
+- Databases: MongoDB (Source), PostgreSQL (Warehouse)
 
-<img width="905" height="872" alt="Screenshot 2025-08-15 224101" src="https://github.com/user-attachments/assets/cd496038-db54-454e-adee-872c4292f597" />
+🚀 Overview
+The pipeline ingests "Movies" and "Comments" data from MongoDB, handles incremental loading, and builds analytical models to identify user-specific movie preferences based on sentiment-filtered comments.
 
-- **Cosmos provides DbtTaskGroup, a method to run DBT build command (tests, snapshots, and run) on airflow.**
++ Ingestion: Python dlt (Data Load Tool) for schema evolution and incremental loading.
+
++ Transformation: dbt for modular SQL modeling (Staging -> Marts).
+
++ Orchestration: Airflow with Cosmos to render dbt models as native Airflow DAG tasks.
+
+🛠️ Technical Implementation
+1. Ingestion (DLT)
+We utilize dlt with the pymongo client to extract collections incrementally.
+
+Incremental Logic: Using write_disposition="merge", we ensure that documents are updated or inserted based on their MongoDB _id to maintain a stable primary key.
+
+Metadata Tracking: DLT automatically generates a _dlt_loads table. We join this in our staging layer to assign an inserted_at timestamp to each row, enabling downstream incremental processing even for source tables without native date columns.
+
+2. Transformation (dbt)
+The transformation layer is split into two primary phases:
+
+Staging: Cleanses raw data and joins it with DLT metadata to establish a reliable loading timeline for the incremental models.
+
+Marts (Sentiment & User Profiles): * Regex-based Filtering: Uses complex regex predicates to identify "good" comments while filtering out "not good" modifiers, ensuring only positive feedback is aggregated.
+
+Incremental Aggregation: Implements an incremental strategy to update user preference arrays (e.g., fav_genres, fav_directors). While Postgres requires unnesting arrays for joins—adding complexity compared to modern warehouses—the logic ensures we only process new data.
+
+3. Orchestration (Airflow + Cosmos)
+By using Astronomer Cosmos, the dbt project is automatically parsed into an Airflow DbtTaskGroup.
 
 <img width="1347" height="657" alt="Screenshot 2025-08-13 231529" src="https://github.com/user-attachments/assets/6b168b05-4c86-496e-aba9-5dc63da3b748" />
 
-- **Moving data using DLT table generates a dlt_load table that contains a insertion date column. 
-It also has a load id column, which also present in each raw table**
+Visual Dependencies: Provides clear visibility of model relationships and dependencies directly within the Airflow UI.
 
-<img width="1147" height="793" alt="Screenshot 2025-08-14 003928" src="https://github.com/user-attachments/assets/33629293-1311-4276-a9f9-cbf496d3c77b" />
+Integrated Quality: Automatically runs dbt test and dbt snapshot as part of the DAG, ensuring data integrity at every step.
 
-- **Join the raw table and dlt load table as a staging view to assign date (insertion date column) to each row 
-in order to run an incremental query in the marts model in case there's no date column present in the initial table.**
+📈 Key Results
+The pipeline successfully transforms raw JSON-like structures into flattened, analytical tables:
 
-<img width="1249" height="239" alt="Screenshot 2025-08-14 003739" src="https://github.com/user-attachments/assets/6e57f465-1007-4b37-9e2f-6497795b23e8" />
+Refined User Profiles: Aggregates comment counts and distinct "favorite" lists (genres, directors, titles) per user based on sentiment.
 
-- **Experimenting by doing an unnessecarily long incremental query doing the count and concatanation which almost has no permorfance benefit over rebuilding the table with simple query everytime. 
-Would be better on modern warehouses since they have rich ways to manipulate arrays, while Postgres needs to unnest the arrays in order to have a flat array when joining two arrays that added the complexity.**
-
-<img width="515" height="804" alt="Screenshot 2025-08-13 232906" src="https://github.com/user-attachments/assets/c73fe180-2f50-4f15-b454-333cf9ebca1e" />
-
-<img width="775" height="325" alt="Screenshot 2025-08-13 234248" src="https://github.com/user-attachments/assets/b25db3ff-2764-4a75-b2c0-ae70b7681509" />
-
-
-- **One of the models is a regex table that grabs the elements of movies for each user with a "good" comment associated to them.**
-<img width="999" height="469" alt="Screenshot 2025-08-13 232717" src="https://github.com/user-attachments/assets/f78daeaa-4171-4724-a9b7-d516c79c4b1b" />
-
-- **Run the airflow pipeline for the first time.**
-  
-- The first run yields:
-
-<img width="434" height="117" alt="Screenshot 2025-08-13 213700" src="https://github.com/user-attachments/assets/772b8079-030b-4c41-8895-0f666a26df70" />
-<img width="1110" height="202" alt="Screenshot 2025-08-13 213648" src="https://github.com/user-attachments/assets/3cb1c7e7-95f0-4421-8a70-2bd7008cb88a" />
-
-- **Then insert some data to test the DBT model that filters only movies, genres, and directors that have "good" comments and the "good" doesnt get prefixed by "not" for each user. A very customizable predicates of course with regex conditions that can be extended.**
-
--Inserting one "good" and one "not good". Should only 1 that get picked up and added to the collections if it works correctly 
-
-<img width="1201" height="896" alt="Screenshot 2025-08-13 231712" src="https://github.com/user-attachments/assets/f6415024-133b-4727-bfe0-65a433fdecaf" />
-
-- **Run the airflow again. Cosmos also run the DBT tests too as explained. The simple tests script:** 
-<img width="883" height="903" alt="Screenshot 2025-08-13 234224" src="https://github.com/user-attachments/assets/0befd2a7-df24-45ea-8d86-01645258f5f8" />
-
-- **Two comments count added for the certain user.**
-
-<img width="896" height="152" alt="Screenshot 2025-08-13 213934" src="https://github.com/user-attachments/assets/6b790c81-bd49-48fc-863a-143c9017c302" />
-<img width="984" height="178" alt="Screenshot 2025-08-13 231502" src="https://github.com/user-attachments/assets/8f3f1278-5cd1-4e74-825f-d8140354a9cf" />
-
-
-- **But only one movie title is added to the fav_movies array column of the only_good_comments table for the same user. Also only related genres and director related to that movie with "good" comment added to the fav_genres and fav_director respectively**
+Efficiency: The incremental logic reduces compute costs and execution time by focusing only on changed records from the MongoDB source.
 
 <img width="1133" height="165" alt="Screenshot 2025-08-13 231431" src="https://github.com/user-attachments/assets/eae907b9-8b52-49cb-8665-ed4518a7fce6" />
 <img width="1117" height="204" alt="Screenshot 2025-08-13 231448" src="https://github.com/user-attachments/assets/991b01ba-667f-437f-8905-17e2c98530e1" />
